@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 var wg = sync.WaitGroup{}
@@ -22,26 +23,24 @@ var (
 )
 
 func main() {
-	ch := make(chan int)
-
-	wg.Add(2)
-	go func() {
-		i := <- ch
-		fmt.Println(i)
-		wg.Done()
-	}()
-	go func() {
-		ch <- 42
-		wg.Done()
-	}()
-
-	wg.Wait()
-
+	//ch := make(chan int)
 	//
-	//go func(ch chan <- int) {
-	//	ch <- 5
-	//	ch <- 10
-	//	ch <- 12
+	//wg.Add(1)
+	//go func(ch <-chan int) {
+	//
+	//	for i := range ch {
+	//		fmt.Println(i)
+	//	}
+	//
+	//	wg.Done()
+	//}(ch)
+	//
+	//wg.Add(1)
+	//go func(ch chan<- int) {
+	//	ch <- 42
+	//	ch <- 55
+	//	ch <- 41
+	//	ch <- 50
 	//	close(ch)
 	//	wg.Done()
 	//}(ch)
@@ -49,16 +48,12 @@ func main() {
 	//wg.Wait()
 
 	//using select statement and signal channels
-	//go logger()
-	//defer func() {
-	//	close(logCh)
-	//}()
-	//logCh <- log{logInfo, "App is starting"}
-	//logCh <- log{logInfo, "Shutting down"}
-	//doneCh <- struct{}{}
-	//
-	//time.Sleep(200 * time.Millisecond)
-	//logCh <- log{logInfo, "Shutting down"}
+	go logger()
+	logCh <- log{logInfo, "App is starting"}
+	logCh <- log{logInfo, "Shutting down"}
+	doneCh <- struct{}{}
+
+	time.Sleep(200 * time.Millisecond)
 }
 
 func logger() {

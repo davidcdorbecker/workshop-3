@@ -11,8 +11,9 @@ import (
 
 func main() {
 	//background()
-	withCancel()
+	//withCancel()
 	//withTimeOut()
+	withValue()
 }
 
 func background() {
@@ -35,16 +36,24 @@ func withCancel() {
 
 func withTimeOut() {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 2 * time.Second)
+	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(time.Second))
 	defer cancel()
 
 	sleepAndTalk(ctx, 3*time.Second, "Hello withTimeOut!")
 }
 
+func withValue() {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "ctx-key", " with value")
+	sleepAndTalk(ctx, time.Second, "hello")
+	//
+}
+
 func sleepAndTalk(ctx context.Context, d time.Duration, s string) {
+	msg := ctx.Value("ctx-key").(string)
 	select {
 	case <-time.After(d):
-		fmt.Println(s)
+		fmt.Println(s, msg)
 	case <-ctx.Done():
 		log.Println(ctx.Err())
 	}
